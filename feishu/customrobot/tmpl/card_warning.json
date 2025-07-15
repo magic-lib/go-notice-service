@@ -1,0 +1,87 @@
+{
+  "msg_type":  "interactive",
+  "card": {
+    "config": {
+      "update_multi": true
+    },
+    "i18n_header": {
+      "zh_cn": {
+        "title": {
+          "tag": "plain_text",
+          "content": "{{.title}}"
+        },
+        "subtitle": {
+          "tag": "plain_text",
+          "content": "{{.subtitle}}"
+        },
+        "template": "orange"
+      }
+    },
+    "i18n_elements": {
+      "zh_cn": [
+        {
+          "tag": "markdown",
+          "content": "<font color='orange'>请及时处理该异常，避免影响正常业务</font>",
+          "text_align": "left",
+          "text_size": "normal",
+          "icon": {
+            "tag": "standard_icon",
+            "token": "warning_outlined",
+            "color": "orange"
+          }
+        },
+        {
+          "tag": "markdown",
+          "content": "**告警时间：**@warning_time\n**异常系统：**@warning_system",
+          "text_align": "left",
+          "text_size": "normal"
+        },
+        {
+          "tag": "markdown",
+          "content": "",
+          "text_align": "left",
+          "text_size": "normal"
+        },
+        {
+          "tag": "table",
+          "columns": [
+            {
+              "data_type": "text",
+              "name": "module",
+              "display_name": "异常模块",
+              "horizontal_align": "left",
+              "width": "auto"
+            },
+            {
+              "data_type": "text",
+              "name": "reason",
+              "display_name": "异常原因",
+              "horizontal_align": "left",
+              "width": "auto"
+            },
+            {
+              "data_type": "number",
+              "name": "count",
+              "display_name": "异常数量",
+              "horizontal_align": "right",
+              "width": "auto",
+              "format": {
+                "precision": 0
+              }
+            }
+          ],
+          "rows": [],
+          "row_height": "low",
+          "header_style": {
+            "background_style": "none",
+            "bold": true,
+            "lines": 1
+          },
+          "page_size": 5
+        }
+      ]
+    }
+  },
+  "sign":      "{{.sign}}",
+  "timestamp": "{{.timestamp}}"
+}
