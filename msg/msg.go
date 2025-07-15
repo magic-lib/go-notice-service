@@ -12,7 +12,7 @@ type Receiver struct {
 
 // Message 消息接口，定义发送消息的基本行为
 type Message interface {
-	Channel() ChannelType                     // 消息渠道
+	Channel() (ChannelType, ChannelKey)       // 消息渠道
 	MsgType() MessageType                     // MsgType 消息类型（文本、图片、卡片等）
 	Receivers() []*Receiver                   // Receivers 消息接收者（用户ID、群组ID等）
 	Title() string                            // 消息标题
@@ -22,8 +22,8 @@ type Message interface {
 	Send(ctx context.Context) (string, error) // 执行发送
 }
 
-// TemplateMessage 模板消息接口
-type TemplateMessage interface {
+// MessageTemplate 模板消息接口
+type MessageTemplate interface {
 	Message
 	TemplateId() string           // 模板ID
 	TemplateData() map[string]any // 模板变量

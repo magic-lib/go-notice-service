@@ -1,6 +1,8 @@
 package msgbuild
 
-import "github.com/magic-lib/go-notice-service/msg"
+import (
+	"github.com/magic-lib/go-notice-service/msg"
+)
 
 // MessageBuilder 消息构建器
 type MessageBuilder struct {
@@ -11,15 +13,42 @@ type MessageBuilder struct {
 func NewMessageBuilder() *MessageBuilder {
 	return &MessageBuilder{
 		msg: messageImpl{
-			receivers: make([]*msg.Receiver, 0),
-			options:   make(map[string]any),
+			receivers:    make([]*msg.Receiver, 0),
+			options:      make(map[string]any),
+			templateData: make(map[string]any),
 		},
 	}
 }
 
+// WithTemplateId 设置模版ID
+func (b *MessageBuilder) WithTemplateId(templateId string) *MessageBuilder {
+	b.msg.templateId = templateId
+	return b
+}
+
+// WithTemplateData 设置模版数据
+func (b *MessageBuilder) WithTemplateData(data map[string]any) *MessageBuilder {
+	if len(data) > 0 {
+		for k, v := range data {
+			b.msg.templateData[k] = v
+		}
+	}
+	return b
+}
+
 // WithChannel 设置消息渠道
-func (b *MessageBuilder) WithChannel(channel msg.ChannelType) *MessageBuilder {
+func (b *MessageBuilder) WithChannel(channel msg.ChannelType, channelKey msg.ChannelKey) *MessageBuilder {
 	b.msg.channel = channel
+	b.msg.channelKey = channelKey
+	return b
+}
+func (b *MessageBuilder) WithChannelAdapter(adapter ChannelAdapter) *MessageBuilder {
+	channels := adapter.SupportedChannels()
+	if len(channels) == 0 {
+		return b
+	}
+	b.msg.channel = channels[0]
+	b.msg.channelKey = adapter.ChannelKey()
 	return b
 }
 
@@ -30,13 +59,18 @@ func (b *MessageBuilder) WithType(msgType msg.MessageType) *MessageBuilder {
 }
 
 // WithReceiver 添加接收者
-func (b *MessageBuilder) WithReceiver(typ msg.ReceiverType, id, name string, extra any) *MessageBuilder {
+func (b *MessageBuilder) WithReceiver(typ msg.ReceiverType, id string) *MessageBuilder {
 	b.msg.receivers = append(b.msg.receivers, &msg.Receiver{
-		Type:  typ,
-		Id:    id,
-		Name:  name,
-		Extra: extra,
+		Type: typ,
+		Id:   id,
 	})
+	return b
+}
+func (b *MessageBuilder) WithOneReceiver(receiver *msg.Receiver) *MessageBuilder {
+	if receiver == nil {
+		return b
+	}
+	b.msg.receivers = append(b.msg.receivers, receiver)
 	return b
 }
 
@@ -57,8 +91,16 @@ func (b *MessageBuilder) WithOption(key string, value any) *MessageBuilder {
 	b.msg.options[key] = value
 	return b
 }
+func (b *MessageBuilder) WithOptions(data map[string]any) *MessageBuilder {
+	if len(data) > 0 {
+		for k, v := range data {
+			b.msg.options[k] = v
+		}
+	}
+	return b
+}
 
 // Build 构建消息
-func (b *MessageBuilder) Build() msg.Message {
+func (b *MessageBuilder) Build() msg.MessageTemplate {
 	return &b.msg
 }

@@ -30,13 +30,20 @@ var (
 	allTemplateFiles = make(map[string]string)
 )
 
+type sendResp struct {
+	Code int `json:"code"`
+	Data struct {
+	} `json:"data"`
+	Msg string `json:"msg"`
+}
+
 type feiShuBot struct {
 	botUrl string
 }
 
 func NewFeiShuBot(botUrl string) *feiShuBot {
 	if len(allTemplateFiles) == 0 {
-		templateTemp, err := readAllTemplateFiles(tmplPath)
+		templateTemp, err := readAllTemplateJsonFiles(tmplPath)
 		if err != nil {
 			panic(err)
 		}
@@ -93,10 +100,20 @@ func (f *feiShuBot) getFeiShuSignature(timeNow time.Time) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	signKey := fmt.Sprintf("%d\n%s\n", timeNow.Unix(), token)
-	h := hmac.New(sha256.New, []byte(signKey))
-	h.Write([]byte{}) // Empty data as in original
-	return base64.StdEncoding.EncodeToString(h.Sum(nil)), nil
+	return genSign(token, timeNow.Unix())
+}
+
+func genSign(secret string, timestamp int64) (string, error) {
+	//timestamp + key 做sha256, 再进行base64 encode
+	stringToSign := fmt.Sprintf("%v\n%s", timestamp, secret)
+	var data []byte
+	h := hmac.New(sha256.New, []byte(stringToSign))
+	_, err := h.Write(data)
+	if err != nil {
+		return "", err
+	}
+	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
+	return signature, nil
 }
 
 func (f *feiShuBot) botPost(ctx context.Context, text string) (string, error) {
@@ -112,21 +129,28 @@ func (f *feiShuBot) botPost(ctx context.Context, text string) (string, error) {
 	if resp.Error != nil {
 		return "", resp.Error
 	}
-	return resp.Response, nil
-}
-
-func (f *feiShuBot) SendWithJson(ctx context.Context, jsonString string, messages msg.Message) (string, error) {
-	optMap, err := f.getMessageMap(messages)
+	sendBotResp := new(sendResp)
+	err = conv.Unmarshal(resp.Response, sendBotResp)
 	if err != nil {
 		return "", err
 	}
+	if sendBotResp.Code != 0 {
+		return "", fmt.Errorf("发送消息失败: %s", sendBotResp.Msg)
+	}
 
-	jsonString, _ = sjson.Set(jsonString, "sign", optMap["sign"])
-	jsonString, _ = sjson.Set(jsonString, "timestamp", optMap["timestamp"])
-	msgBody, err := templates.Template(jsonString, optMap)
+	return resp.Response, nil
+}
+
+func (f *feiShuBot) sendWithJson(ctx context.Context, msgBody string, optMap map[string]any) (string, error) {
+	if _, ok := optMap["sign"]; ok {
+		if _, ok = optMap["timestamp"]; ok {
+			msgBody, _ = sjson.Set(msgBody, "sign", optMap["sign"])
+			msgBody, _ = sjson.Set(msgBody, "timestamp", optMap["timestamp"])
+		}
+	}
 
 	var data interface{}
-	err = json.Unmarshal([]byte(msgBody), &data)
+	err := json.Unmarshal([]byte(msgBody), &data)
 	if err != nil {
 		return "", err
 	}
@@ -139,7 +163,7 @@ func (f *feiShuBot) SendWithJson(ctx context.Context, jsonString string, message
 	return resp, nil
 }
 
-func (f *feiShuBot) getMessageMap(messages msg.Message) (map[string]any, error) {
+func (f *feiShuBot) getMessageMap(messages msg.Message, mapData map[string]any) (map[string]any, error) {
 	timeNow := time.Now()
 	sign, err := f.getFeiShuSignature(timeNow)
 	if err != nil {
@@ -148,19 +172,32 @@ func (f *feiShuBot) getMessageMap(messages msg.Message) (map[string]any, error) 
 	if messages == nil {
 		messages = msgbuild.NewMessageBuilder().Build()
 	}
+	if mapData == nil {
+		mapData = make(map[string]any)
+	}
 
 	optMap := messages.Options()
-	optMap["title"] = messages.Title()
-	optMap["sign"] = sign
-	optMap["timestamp"] = timeNow.Unix()
+	for k, v := range optMap {
+		if _, ok := mapData[k]; ok {
+			continue
+		}
+		mapData[k] = v
+	}
+	if messages.Title() != "" {
+		mapData["title"] = messages.Title()
+	}
+	mapData["sign"] = sign
+	mapData["timestamp"] = timeNow.Unix()
 
-	if _, ok := optMap["title_color"]; !ok {
-		optMap["title_color"] = "orange"
+	if _, ok := mapData["title_color"]; !ok {
+		mapData["title_color"] = "orange"
 	}
-	if _, ok := optMap["subtitle"]; !ok {
-		optMap["subtitle"] = ""
+	if _, ok := mapData["subtitle"]; !ok {
+		mapData["subtitle"] = ""
 	}
-	return optMap, nil
+
+	mapData["content"] = conv.String(messages.Content())
+	return mapData, nil
 }
 
 func (f *feiShuBot) getContentByTemplateId(templateId string) string {
@@ -174,10 +211,73 @@ func (f *feiShuBot) getContentByTemplateId(templateId string) string {
 	return ""
 }
 
-func (f *feiShuBot) SendByTemplateId(ctx context.Context, templateId string, messages msg.Message) (string, error) {
-	msgBodyTmpl := f.getContentByTemplateId(templateId)
-	if msgBodyTmpl == "" {
-		return "", fmt.Errorf("invalid templateId: %s", templateId)
+func (f *feiShuBot) getContentJsonByType(msgType msg.MessageType, msgInfo msg.Message) (string, error) {
+	if msgType == msg.MsgTypeText {
+		content := map[string]any{
+			"msg_type": "text",
+			"content": map[string]any{
+				"text": conv.String(msgInfo.Content()),
+			},
+		}
+		return conv.String(content), nil
+	} else if msgType == msg.MsgTypePost {
+		content := map[string]any{
+			"msg_type": "post",
+			"content": map[string]any{
+				"post": map[string]any{
+					"zh_cn": map[string]any{
+						"title":   msgInfo.Title(),
+						"content": msgInfo.Content(),
+					},
+				},
+			},
+		}
+		return conv.String(content), nil
+	} else if msgType == "share_chat" {
+		content := map[string]string{
+			"chat_id": conv.String(msgInfo.Content()),
+		}
+		return conv.String(content), nil
+	} else if msgType == msg.MsgTypeImage {
+		content := map[string]string{
+			"image_key": conv.String(msgInfo.Content()),
+		}
+		return conv.String(content), nil
+	} else if msgType == msg.MsgTypeInteractive {
+		content := map[string]any{
+			"msg_type": "interactive",
+			"card":     conv.String(msgInfo.Content()),
+		}
+		return conv.String(content), nil
 	}
-	return f.SendWithJson(ctx, msgBodyTmpl, messages)
+
+	return "", fmt.Errorf("msg type not support")
+}
+
+// Send https://open.feishu.cn/document/client-docs/bot-v3/add-custom-bot?lang=zh-CN#%E6%94%AF%E6%8C%81%E5%8F%91%E9%80%81%E7%9A%84%E6%B6%88%E6%81%AF%E7%B1%BB%E5%9E%8B%E8%AF%B4%E6%98%8E
+func (f *feiShuBot) Send(ctx context.Context, messages msg.MessageTemplate) (string, error) {
+	if messages == nil {
+		return "", fmt.Errorf("invalid message: empty")
+	}
+
+	optMap, err := f.getMessageMap(messages, messages.TemplateData())
+	if err != nil {
+		return "", err
+	}
+
+	templateId := messages.TemplateId()
+	if templateId != "" {
+		msgBodyTmpl := f.getContentByTemplateId(templateId)
+		if msgBodyTmpl == "" {
+			return "", fmt.Errorf("invalid templateId: %s", templateId)
+		}
+		msgBody, _ := templates.Template(msgBodyTmpl, optMap)
+
+		return f.sendWithJson(ctx, msgBody, optMap)
+	}
+	content, err := f.getContentJsonByType(messages.MsgType(), messages)
+	if err != nil {
+		return "", err
+	}
+	return f.sendWithJson(ctx, content, optMap)
 }

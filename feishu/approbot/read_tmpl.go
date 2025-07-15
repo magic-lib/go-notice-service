@@ -1,4 +1,4 @@
-package customrobot
+package approbot
 
 import (
 	"embed"

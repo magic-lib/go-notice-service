@@ -1,6 +1,7 @@
-package customrobot
+package approbot
 
 import (
+	"fmt"
 	"github.com/magic-lib/go-notice-service/msg"
 	"github.com/magic-lib/go-notice-service/msgbuild"
 )
@@ -16,22 +17,21 @@ func (f *feiShuBotAdapter) ChannelKey() msg.ChannelKey {
 	return f.channelKey
 }
 
-// NewFeiShuCustomRoBotAdapter 创建飞书适配器
-func NewFeiShuCustomRoBotAdapter(channelKey msg.ChannelKey, token string) msgbuild.ChannelAdapter {
-	fb := NewFeiShuBot(token)
+// NewFeiShuAppRoBotAdapter 创建飞书适配器
+func NewFeiShuAppRoBotAdapter(channelKey msg.ChannelKey, appId, appSecret string) msgbuild.ChannelAdapter {
 	if channelKey == "" {
-		channelKeyTemp, _ := fb.getFeiShuBotToken()
-		channelKey = msg.ChannelKey(channelKeyTemp)
+		channelKey = msg.ChannelKey(fmt.Sprintf("%s/%s", appId, appSecret))
 	}
+
 	return &feiShuBotAdapter{
-		feiShuBot:  fb,
+		feiShuBot:  NewFeiShuAppBot(appId, appSecret),
 		channelKey: channelKey,
 	}
 }
 
 func (f *feiShuBotAdapter) SupportedChannels() []msg.ChannelType {
 	return []msg.ChannelType{
-		msg.ChannelFeiShuCustomRoBot,
+		msg.ChannelFeiShuAppRoBot,
 	}
 }
 func (f *feiShuBotAdapter) Send(ctx context.Context, message msg.MessageTemplate) (string, error) {

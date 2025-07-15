@@ -2,8 +2,10 @@ package msg
 
 // ChannelType 消息渠道类型
 type ChannelType string
+type ChannelKey string //同类型可以注册多个，比如机器人，可以有多个来进行单独发送
 
 const (
+	ChannelKeyDefault        ChannelKey  = "default"
 	ChannelFeiShu            ChannelType = "feishu"              // 飞书
 	ChannelFeiShuAppRoBot    ChannelType = "feishu-app-robot"    // 飞书
 	ChannelFeiShuCustomRoBot ChannelType = "feishu-custom-robot" // 飞书
@@ -17,6 +19,7 @@ type MessageType string
 
 const (
 	MsgTypeText        MessageType = "text"        // 文本消息
+	MsgTypePost        MessageType = "post"        // 富文本消息
 	MsgTypeImage       MessageType = "image"       // 图片消息
 	MsgTypeFile        MessageType = "file"        // 文件消息
 	MsgTypeMarkdown    MessageType = "markdown"    // Markdown消息
