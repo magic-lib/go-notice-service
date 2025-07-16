@@ -35,10 +35,14 @@ func (mt MessageType) String() string {
 type ReceiverType string
 
 const (
-	ReceiverOpenId ReceiverType = "open_id" // 用户
-	ReceiverUser   ReceiverType = "user"    // 用户
-	ReceiverGroup  ReceiverType = "group"   // 群组
-	ReceiverChat   ReceiverType = "chat"    // 会话
+	ReceiverOpenId  ReceiverType = "open_id"
+	ReceiverUserId  ReceiverType = "user_id"
+	ReceiverUnionId ReceiverType = "union_id"
+	ReceiverEmail   ReceiverType = "email"
+	ReceiverChatId  ReceiverType = "chat_id"
+	ReceiverUser    ReceiverType = "user"  // 用户
+	ReceiverGroup   ReceiverType = "group" // 群组
+	ReceiverChat    ReceiverType = "chat"  // 会话
 )
 
 func (rt ReceiverType) String() string {
