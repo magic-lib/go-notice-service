@@ -3,9 +3,11 @@ module github.com/magic-lib/go-notice-service
 go 1.24.3
 
 require (
+	github.com/hashicorp/go-multierror v1.1.1
 	github.com/larksuite/oapi-sdk-go/v3 v3.4.21
 	github.com/magic-lib/go-plat-curl v1.20250627.1
-	github.com/magic-lib/go-plat-utils v1.20250709.1
+	github.com/magic-lib/go-plat-utils v1.20250627.1
+	github.com/samber/lo v1.49.1
 	github.com/tidwall/sjson v1.2.5
 	golang.org/x/net v0.38.0
 )
@@ -32,7 +34,6 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/iancoleman/orderedmap v0.3.0 // indirect
 	github.com/jimstudt/http-authentication v0.0.0-20140401203705-3eca13d6893a // indirect
@@ -55,7 +56,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/xid v1.6.0 // indirect
-	github.com/samber/lo v1.49.1 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/soniah/evaler v2.2.0+incompatible // indirect
 	github.com/sony/sonyflake v1.2.0 // indirect
