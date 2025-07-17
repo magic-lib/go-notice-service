@@ -93,3 +93,8 @@ func TestSendCardWarning1(t *testing.T) {
 	resp, err := fsBot.Send(context.Background(), messages)
 	fmt.Println(resp, err)
 }
+func TestSendCardWarning12(t *testing.T) {
+	fsBot := approbot.NewFeiShuAppBot(appId, appSecret)
+	userList, err := fsBot.UserIdMapByMobiles("open_id", []string{""})
+	fmt.Println(userList, err)
+}

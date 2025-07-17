@@ -13,6 +13,7 @@ import (
 	"github.com/magic-lib/go-plat-utils/templates"
 	"github.com/samber/lo"
 	"log"
+	"strings"
 )
 
 type feiShuBot struct {
@@ -118,6 +119,7 @@ func (m *feiShuBot) getContent(msgInfo msg.MessageTemplate) (string, error) {
 			return "", fmt.Errorf("invalid templateId: %s", templateId)
 		}
 		content, _ = templates.Template(msgBodyTmpl, optMap)
+		content = strings.ReplaceAll(content, "<no value>", "")
 	} else {
 		content, err = m.getContentJsonByType(msgInfo.MsgType(), msgInfo)
 		if err != nil {

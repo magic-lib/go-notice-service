@@ -271,9 +271,9 @@ func (f *feiShuBot) Send(ctx context.Context, messages msg.MessageTemplate) (str
 		if msgBodyTmpl == "" {
 			return "", fmt.Errorf("invalid templateId: %s", templateId)
 		}
-		msgBody, _ := templates.Template(msgBodyTmpl, optMap)
-
-		return f.sendWithJson(ctx, msgBody, optMap)
+		content, _ := templates.Template(msgBodyTmpl, optMap)
+		content = strings.ReplaceAll(content, "<no value>", "")
+		return f.sendWithJson(ctx, content, optMap)
 	}
 	content, err := f.getContentJsonByType(messages.MsgType(), messages)
 	if err != nil {
