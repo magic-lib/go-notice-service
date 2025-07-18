@@ -1,0 +1,21 @@
+{
+  "config": {
+    "update_multi": true
+  },
+  "i18n_header": {
+    "zh_cn": {
+      "title": {
+        "tag": "plain_text",
+        "content": "{{.title}}"
+      },
+      "subtitle": {
+        "tag": "plain_text",
+        "content": "{{.subtitle}}"
+      },
+      "template": "{{.title_color}}"
+    }
+  },
+  "i18n_elements": {
+    "zh_cn": {{.content}}
+  }
+}
