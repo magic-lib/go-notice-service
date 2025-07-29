@@ -18,7 +18,10 @@ func (f *feiShuBotAdapter) ChannelKey() msg.ChannelKey {
 }
 
 // NewFeiShuAppRoBotAdapter 创建飞书适配器
-func NewFeiShuAppRoBotAdapter(channelKey msg.ChannelKey, appId, appSecret string) msgbuild.ChannelAdapter {
+func NewFeiShuAppRoBotAdapter(channelKey msg.ChannelKey, appId, appSecret string) (msgbuild.ChannelAdapter, error) {
+	if appId == "" || appSecret == "" {
+		return nil, fmt.Errorf("appId和appSecret不能为空")
+	}
 	if channelKey == "" {
 		channelKey = msg.ChannelKey(fmt.Sprintf("%s/%s", appId, appSecret))
 	}
@@ -26,7 +29,7 @@ func NewFeiShuAppRoBotAdapter(channelKey msg.ChannelKey, appId, appSecret string
 	return &feiShuBotAdapter{
 		feiShuBot:  NewFeiShuAppBot(appId, appSecret),
 		channelKey: channelKey,
-	}
+	}, nil
 }
 
 func (f *feiShuBotAdapter) SupportedChannels() []msg.ChannelType {

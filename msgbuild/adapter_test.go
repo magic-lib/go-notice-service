@@ -18,7 +18,7 @@ func TestFeiShuCustomRobotAdapterManager(t *testing.T) {
 
 	// 注册飞书适配器
 	//customRoBot := customrobot.NewFeiShuCustomRoBotAdapter("", "")
-	appRoBot := approbot.NewFeiShuAppRoBotAdapter("", appId, appSecret)
+	appRoBot, _ := approbot.NewFeiShuAppRoBotAdapter("", appId, appSecret)
 
 	registry := msgbuild.NewChannelAdapterManager()
 	//registry.RegisterAll(customRoBot, appRoBot)
