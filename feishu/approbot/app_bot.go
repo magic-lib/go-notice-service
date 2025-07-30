@@ -158,6 +158,8 @@ func (m *feiShuBot) sendToOne(ctx context.Context, oneReceiver *msg.Receiver, co
 			Content(content).
 			Build()).Build()
 
+	log.Printf("app bot sendToOne req, type: %s, receiver: %s, msgType: %s", oneReceiver.Type.String(), oneReceiver.Id, msgInfo.MsgType().String())
+
 	// 发起请求
 	resp, err := m.client.Im.V1.Message.Create(ctx, req)
 	if err != nil {

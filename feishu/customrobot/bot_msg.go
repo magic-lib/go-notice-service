@@ -14,6 +14,7 @@ import (
 	"github.com/magic-lib/go-plat-utils/templates"
 	"github.com/tidwall/sjson"
 	"golang.org/x/net/context"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -121,6 +122,9 @@ func (f *feiShuBot) botPost(ctx context.Context, text string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	log.Printf("custom bot sendToOne req, type: %s", botUrl)
+
 	resp := curl.NewClient().NewRequest(&curl.Request{
 		Url:    botUrl,
 		Data:   text,
