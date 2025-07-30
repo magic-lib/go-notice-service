@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/larksuite/oapi-sdk-go/v3 v3.4.21
 	github.com/magic-lib/go-plat-curl v1.20250627.1
-	github.com/magic-lib/go-plat-utils v1.20250627.1
+	github.com/magic-lib/go-plat-utils v1.20250721.2
 	github.com/samber/lo v1.49.1
 	github.com/tidwall/sjson v1.2.5
 	golang.org/x/net v0.38.0
@@ -59,6 +59,7 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/soniah/evaler v2.2.0+incompatible // indirect
 	github.com/sony/sonyflake v1.2.0 // indirect
+	github.com/spf13/cast v1.9.2 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
