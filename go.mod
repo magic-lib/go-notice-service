@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/larksuite/oapi-sdk-go/v3 v3.4.21
 	github.com/magic-lib/go-plat-curl v1.20250627.1
-	github.com/magic-lib/go-plat-utils v1.20250721.2
+	github.com/magic-lib/go-plat-utils v1.20250721.3-0.20250808063941-a370e6d99251
 	github.com/samber/lo v1.49.1
 	github.com/tidwall/sjson v1.2.5
 	golang.org/x/net v0.38.0
@@ -74,6 +74,7 @@ require (
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

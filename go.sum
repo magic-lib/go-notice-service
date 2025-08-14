@@ -123,8 +123,8 @@ github.com/magic-lib/go-plat-curl v1.20250627.1 h1:izbRxuRfFB5rv1wqPyXIYBFXYo+x1
 github.com/magic-lib/go-plat-curl v1.20250627.1/go.mod h1:xWKD1rnzJtiVNj4QPa/15mmlvddRZ0wlYhHn1WxrhQI=
 github.com/magic-lib/go-plat-startupcfg v1.20250405.1 h1:33TQHBEFdJywIEUdYFtEsh86gO3FzpE7fYS/U8miFtU=
 github.com/magic-lib/go-plat-startupcfg v1.20250405.1/go.mod h1:BJL6989sl0t6StzLp8H6wOIS/Dvo4JgGJnL3yMV4ar4=
-github.com/magic-lib/go-plat-utils v1.20250721.2 h1:w+3HObXhktl7EBzRIkoQKCgVVx8hELRS1v2nlE4B2uU=
-github.com/magic-lib/go-plat-utils v1.20250721.2/go.mod h1:Fb7eO2KbwfStdgKtmikz5qICyhsuJ1rmklGmM+l2A0c=
+github.com/magic-lib/go-plat-utils v1.20250721.3-0.20250808063941-a370e6d99251 h1:Cn1lx8nVSiLX0mb+6mkPVwdda70014bp0vdoC4wZkEc=
+github.com/magic-lib/go-plat-utils v1.20250721.3-0.20250808063941-a370e6d99251/go.mod h1:291x3NfVChh9A3iDs6Syzvo6twaX1C8ZFR6U8oQaJz0=
 github.com/marspere/goencrypt v1.0.7 h1:Rlvsc9b7Yeaeda+gsGeCjREVZ/KL7szelRq4+haK5mw=
 github.com/marspere/goencrypt v1.0.7/go.mod h1:S5g6Wsd5jcOO01sp9QxNMYCldx9kecoDkK7BWaHA0vo=
 github.com/mattn/go-colorable v0.1.13 h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=
@@ -292,6 +292,8 @@ google.golang.org/protobuf v1.26.0-rc.1/go.mod h1:jlhhOSvTdKEhbULTjvd4ARK9grFBp0
 google.golang.org/protobuf v1.26.0/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
 google.golang.org/protobuf v1.27.1/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
 google.golang.org/protobuf v1.28.0/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
+google.golang.org/protobuf v1.36.5 h1:tPhr+woSbjfYvY6/GPufUoYizxw1cF/yFoxJ2fmpwlM=
+google.golang.org/protobuf v1.36.5/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f h1:BLraFXnmrev5lT+xlilqcH8XK9/i0At2xKjWk4p6zsU=
 gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
