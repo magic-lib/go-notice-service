@@ -48,6 +48,28 @@ func TestSendPost(t *testing.T) {
 	resp, err := fsBot.Send(context.Background(), messages)
 	fmt.Println(resp, err)
 }
+func TestSendPost2(t *testing.T) {
+	fsBot := approbot.NewFeiShuAppBot(appId, appSecret)
+	contentList := []any{
+		[]any{
+			map[string]any{
+				"tag":  "text",
+				"text": "项目有更新:",
+			},
+			map[string]any{
+				"tag":     "at",
+				"user_id": "all",
+			},
+		},
+	}
+
+	messages := msgbuild.NewMessageBuilder().WithTitle("这是一个标题").
+		WithType(msg.MsgTypePost).
+		WithReceiver(msg.ReceiverOpenId, openId).
+		WithContent(contentList).Build()
+	resp, err := fsBot.Send(context.Background(), messages)
+	fmt.Println(resp, err)
+}
 
 func TestSendShareChat(t *testing.T) {
 	fsBot := approbot.NewFeiShuAppBot(appId, appSecret)

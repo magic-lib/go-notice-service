@@ -217,21 +217,41 @@ func (f *feiShuBot) getContentByTemplateId(templateId string) string {
 
 func (f *feiShuBot) getContentJsonByType(msgType msg.MessageType, msgInfo msg.Message) (string, error) {
 	if msgType == msg.MsgTypeText {
+		contentTemp := conv.String(msgInfo.Content())
+
+		if msgInfo.Title() != "" {
+			return f.getContentJsonByType(msg.MsgTypePost, msgInfo)
+		}
+
 		content := map[string]any{
 			"msg_type": "text",
 			"content": map[string]any{
-				"text": conv.String(msgInfo.Content()),
+				"text": contentTemp,
 			},
 		}
 		return conv.String(content), nil
 	} else if msgType == msg.MsgTypePost {
+		contentTemp := msgInfo.Content()
+		if temp, ok := contentTemp.(string); ok {
+			if ok = cond.IsJson(temp); !ok {
+				contentTemp = []any{
+					[]any{
+						map[string]any{
+							"tag":  "text",
+							"text": temp,
+						},
+					},
+				}
+			}
+		}
+
 		content := map[string]any{
 			"msg_type": "post",
 			"content": map[string]any{
 				"post": map[string]any{
 					"zh_cn": map[string]any{
 						"title":   msgInfo.Title(),
-						"content": msgInfo.Content(),
+						"content": contentTemp,
 					},
 				},
 			},

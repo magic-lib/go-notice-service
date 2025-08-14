@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	botToken = ""
+	botToken = "5226bced-fd8c-4ea3-b8db-b50e5f5a7733"
 )
 
 func TestSendText(t *testing.T) {
