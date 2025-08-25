@@ -81,7 +81,7 @@ func (m *feiShuBot) Send(ctx context.Context, msgInfo msg.MessageTemplate) (stri
 		return "", fmt.Errorf("receives is empty")
 	}
 
-	var content, err = m.getContent(msgInfo)
+	var content, contentType, err = m.getContent(msgInfo)
 	if err != nil {
 		return "", err
 	}
@@ -89,7 +89,7 @@ func (m *feiShuBot) Send(ctx context.Context, msgInfo msg.MessageTemplate) (stri
 	var retString = make([]string, 0)
 	var retErr error
 	lo.ForEach(receives, func(oneReceiver *msg.Receiver, index int) {
-		retStr, err := m.sendToOne(ctx, oneReceiver, content, msgInfo)
+		retStr, err := m.sendToOne(ctx, oneReceiver, content, contentType, msgInfo)
 		if err != nil {
 			retErr = multierror.Append(retErr, err)
 		} else {
@@ -106,27 +106,28 @@ func (m *feiShuBot) Send(ctx context.Context, msgInfo msg.MessageTemplate) (stri
 	return retString[0], nil
 }
 
-func (m *feiShuBot) getContent(msgInfo msg.MessageTemplate) (string, error) {
+func (m *feiShuBot) getContent(msgInfo msg.MessageTemplate) (string, msg.MessageType, error) {
 	optMap, err := m.getMessageMap(msgInfo, msgInfo.TemplateData())
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	content := ""
+	var messageType msg.MessageType
 	templateId := msgInfo.TemplateId()
 	if templateId != "" {
 		msgBodyTmpl := m.getContentByTemplateId(templateId)
 		if msgBodyTmpl == "" {
-			return "", fmt.Errorf("invalid templateId: %s", templateId)
+			return "", "", fmt.Errorf("invalid templateId: %s", templateId)
 		}
 		content, _ = templates.Template(msgBodyTmpl, optMap)
 		content = strings.ReplaceAll(content, "<no value>", "")
 	} else {
-		content, err = m.getContentJsonByType(msgInfo.MsgType(), msgInfo)
+		content, messageType, err = m.getContentJsonByType(msgInfo.MsgType(), msgInfo)
 		if err != nil {
-			return "", err
+			return "", messageType, err
 		}
 	}
-	return content, nil
+	return content, messageType, nil
 }
 
 func (m *feiShuBot) getContentByTemplateId(templateId string) string {
@@ -140,7 +141,7 @@ func (m *feiShuBot) getContentByTemplateId(templateId string) string {
 	return ""
 }
 
-func (m *feiShuBot) sendToOne(ctx context.Context, oneReceiver *msg.Receiver, content string, msgInfo msg.Message) (string, error) {
+func (m *feiShuBot) sendToOne(ctx context.Context, oneReceiver *msg.Receiver, content string, newMsgType msg.MessageType, msgInfo msg.Message) (string, error) {
 	if m.client == nil {
 		return "", fmt.Errorf("client is nil")
 	}
@@ -149,16 +150,20 @@ func (m *feiShuBot) sendToOne(ctx context.Context, oneReceiver *msg.Receiver, co
 		return "", fmt.Errorf("content is empty")
 	}
 
+	if newMsgType == "" {
+		newMsgType = msgInfo.MsgType()
+	}
+
 	// 创建请求对象
 	req := larkim.NewCreateMessageReqBuilder().
 		ReceiveIdType(oneReceiver.Type.String()).
 		Body(larkim.NewCreateMessageReqBodyBuilder().
 			ReceiveId(oneReceiver.Id).
-			MsgType(msgInfo.MsgType().String()).
+			MsgType(newMsgType.String()).
 			Content(content).
 			Build()).Build()
 
-	log.Printf("app bot sendToOne req, type: %s, receiver: %s, msgType: %s", oneReceiver.Type.String(), oneReceiver.Id, msgInfo.MsgType().String())
+	log.Printf("app bot sendToOne req, type: %s, receiver: %s, msgType: %s", oneReceiver.Type.String(), oneReceiver.Id, newMsgType.String())
 
 	// 发起请求
 	resp, err := m.client.Im.V1.Message.Create(ctx, req)
@@ -173,12 +178,34 @@ func (m *feiShuBot) sendToOne(ctx context.Context, oneReceiver *msg.Receiver, co
 
 // https://open.feishu.cn/document/server-docs/im-v1/message-content-description/create_json
 // https://open.feishu.cn/cardkit?from=open_docs_tool_overview
-func (m *feiShuBot) getContentJsonByType(msgType msg.MessageType, msgInfo msg.Message) (string, error) {
+func (m *feiShuBot) getContentJsonByType(msgType msg.MessageType, msgInfo msg.Message) (string, msg.MessageType, error) {
 	if msgType == msg.MsgTypeText {
-		content := map[string]any{
-			"text": conv.String(msgInfo.Content()),
+		contentTemp := conv.String(msgInfo.Content())
+
+		if msgInfo.Title() != "" {
+			content := map[string]map[string]any{
+				"zh_cn": {},
+			}
+			if msgInfo.Title() != "" {
+				content["zh_cn"]["title"] = msgInfo.Title()
+			}
+			if msgInfo.Content() != "" {
+				content["zh_cn"]["content"] = [][]map[string]any{
+					{
+						{
+							"tag":  "text",
+							"text": msgInfo.Content(),
+						},
+					},
+				}
+			}
+			return conv.String(content), msg.MsgTypePost, nil
 		}
-		return conv.String(content), nil
+
+		content := map[string]any{
+			"text": contentTemp,
+		}
+		return conv.String(content), msg.MsgTypeText, nil
 	} else if msgType == msg.MsgTypePost {
 		content := map[string]map[string]any{
 			"zh_cn": {},
@@ -189,20 +216,20 @@ func (m *feiShuBot) getContentJsonByType(msgType msg.MessageType, msgInfo msg.Me
 		if msgInfo.Content() != "" {
 			content["zh_cn"]["content"] = msgInfo.Content()
 		}
-		return conv.String(content), nil
+		return conv.String(content), msg.MsgTypePost, nil
 	} else if msgType == "share_chat" {
 		content := map[string]string{
 			"chat_id": conv.String(msgInfo.Content()),
 		}
-		return conv.String(content), nil
+		return conv.String(content), "share_chat", nil
 	} else if msgType == msg.MsgTypeImage {
 		content := map[string]string{
 			"image_key": conv.String(msgInfo.Content()),
 		}
-		return conv.String(content), nil
+		return conv.String(content), msg.MsgTypeImage, nil
 	} else if msgType == msg.MsgTypeInteractive {
-		return conv.String(msgInfo.Content()), nil
+		return conv.String(msgInfo.Content()), msg.MsgTypeInteractive, nil
 	}
 
-	return "", fmt.Errorf("msg type not support")
+	return "", "", fmt.Errorf("msg type not support")
 }

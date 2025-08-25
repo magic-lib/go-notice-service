@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/larksuite/oapi-sdk-go/v3 v3.4.21
 	github.com/magic-lib/go-plat-curl v1.20250627.1
-	github.com/magic-lib/go-plat-utils v1.20250721.3-0.20250808063941-a370e6d99251
+	github.com/magic-lib/go-plat-utils v1.20250721.3-0.20250824012926-658ff2957b8d
 	github.com/samber/lo v1.49.1
 	github.com/tidwall/sjson v1.2.5
 	golang.org/x/net v0.38.0

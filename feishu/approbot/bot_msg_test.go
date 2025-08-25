@@ -19,8 +19,8 @@ func TestSendText(t *testing.T) {
 	fsBot := approbot.NewFeiShuAppBot(appId, appSecret)
 	messages := msgbuild.NewMessageBuilder().WithTitle("这是一个标题").
 		WithType(msg.MsgTypeText).
-		WithReceiver(msg.ReceiverOpenId, openId).
-		WithContent("<at user_id=\"ou_xxx\">Tom</at> 新更新提醒").Build()
+		WithReceiver(msg.ReceiverUserId, openId).
+		WithContent("新更新提醒").Build()
 
 	resp, err := fsBot.Send(context.Background(), messages)
 	fmt.Println(resp, err)
