@@ -80,16 +80,24 @@ func (m *ChannelAdapterManager) GetChannels() map[msg.ChannelType][]msg.ChannelK
 
 // GetAdapter 获取渠道适配器
 func (m *ChannelAdapterManager) GetAdapter(channel msg.ChannelType, key msg.ChannelKey) ChannelAdapter {
-	if adapter, ok := m.adapters[channel]; ok {
-		if key != "" {
-			if oneAdapter, ok := adapter[key]; ok {
-				return oneAdapter
-			}
+	if channel == "" {
+		return nil
+	}
+	adapter, ok := m.adapters[channel]
+	if !ok {
+		return nil
+	}
+	// 表示需要强匹配
+	if key != "" {
+		if oneAdapter, ok := adapter[key]; ok {
+			return oneAdapter
 		}
-		if len(adapter) == 1 { // 只有一个适配器，直接返回
-			for _, oneAdapter := range adapter {
-				return oneAdapter
-			}
+		return nil
+	}
+	//key为空表示可以使用默认值
+	if len(adapter) >= 1 {
+		for _, oneAdapter := range adapter {
+			return oneAdapter
 		}
 	}
 	return nil
